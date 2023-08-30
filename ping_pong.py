@@ -10,6 +10,11 @@ load_dotenv()
 
 # Read the bot token from environment variable
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+DARK_JOKE_URL = "https://v2.jokeapi.dev/joke/Dark"
+ANY_JOKE_URL = "https://v2.jokeapi.dev/joke/Any"
+PROGRAMMING_JOKE_URL = "https://v2.jokeapi.dev/joke/Programming"
+
+ERROR_MESSAGE = "Couldn't fetch a joke at the moment."
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -26,9 +31,8 @@ async def on_ready():
 @bot.command()
 async def joke(ctx):
     # Make a GET request to the JokeAPI
-    response = requests.get("https://v2.jokeapi.dev/joke/Programming")
-    
-    # If the GET request is successful, the status code will be 200
+    response = requests.get(PROGRAMMING_JOKE_URL)
+
     if response.status_code == 200:
         joke_data = json.loads(response.text)
         
@@ -41,16 +45,16 @@ async def joke(ctx):
             elif joke_data["type"] == "twopart":
                 await ctx.send(f"{joke_data['setup']}\n{joke_data['delivery']}")
             else:
-                await ctx.send("Couldn't fetch a joke at the moment.")
+                await ctx.send(ERROR_MESSAGE)
         else:
-            await ctx.send("Couldn't fetch a joke at the moment.")
+            await ctx.send(ERROR_MESSAGE)
     else:
-        await ctx.send("Couldn't fetch a joke at the moment.")
+        await ctx.send(ERROR_MESSAGE)
 
 @bot.command()
 async def dark(ctx):
     # Make a GET request to the JokeAPI for Dark jokes
-    response = requests.get("https://v2.jokeapi.dev/joke/Dark")
+    response = requests.get(DARK_JOKE_URL)
     
     # If the GET request is successful, the status code will be 200
     if response.status_code == 200:
@@ -65,11 +69,35 @@ async def dark(ctx):
             elif joke_data["type"] == "twopart":
                 await ctx.send(f"{joke_data['setup']}\n{joke_data['delivery']}")
             else:
-                await ctx.send("Couldn't fetch a dark joke at the moment.")
+                await ctx.send(ERROR_MESSAGE)
         else:
-            await ctx.send("Couldn't fetch a dark joke at the moment.")
+            await ctx.send(ERROR_MESSAGE)
     else:
-        await ctx.send("Couldn't fetch a dark joke at the moment.")
+        await ctx.send(ERROR_MESSAGE)
+
+@bot.command()
+async def any(ctx):
+    # Make a GET request to the JokeAPI for Dark jokes
+    response = requests.get(ANY_JOKE_URL)
+    
+    # If the GET request is successful, the status code will be 200
+    if response.status_code == 200:
+        joke_data = json.loads(response.text)
+        
+        if not joke_data.get("error"):
+            # If it's a 'single' type joke, i.e., a one-liner
+            if joke_data["type"] == "single":
+                await ctx.send(joke_data["joke"])
+            # If it's a two-part joke with a setup and a delivery
+            elif joke_data["type"] == "twopart":
+                await ctx.send(f"{joke_data['setup']}\n{joke_data['delivery']}")
+            else:
+                await ctx.send(ERROR_MESSAGE)
+        else:
+            await ctx.send(ERROR_MESSAGE)
+    else:
+        await ctx.send(ERROR_MESSAGE)
+
 
 # Run the bot
 bot.run(BOT_TOKEN)
