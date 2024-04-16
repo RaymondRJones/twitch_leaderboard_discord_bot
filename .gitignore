@@ -1,3 +1,6 @@
 .env
 myvenv/
 requests
+venv/
+python/
+python.zip
