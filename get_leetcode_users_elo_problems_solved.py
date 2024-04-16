@@ -94,8 +94,7 @@ def read_usernames_from_file(filename):
         return [line.strip() for line in file.readlines()]
 
 def write_elos_to_dynamodb(user_elos):
-    for user, elo in user_elos:
-        problems_solved_count = get_problems_solved(user)
+    for user, elo, problems_solved_count in user_elos:
         response = table.put_item(
             Item={
                 'username': user,
@@ -111,8 +110,9 @@ def main():
     for username in usernames:
         print("Getting elo of...", username)
         elo = int(get_elo_of_leetcoder(username))
+        problems_solved_count = get_problems_solved(username)
         if elo is not None:
-            user_elos.append((username, elo))
+            user_elos.append((username, elo, problems_solved_count))
             print("Success! Adding value of elo", elo, "to", username)
     write_elos_to_dynamodb(user_elos)
 

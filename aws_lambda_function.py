@@ -18,14 +18,19 @@ def lambda_handler(event, context):
     sorted_items = sorted(items, key=lambda x: x['elo'], reverse=True)
 
     # Construct the message to send to Discord
-    message_lines = ["Player Rankings:"]
+    message_lines = ["Here are a list of the players ranked by elo"]
+    message_lines.append("-------------")
     for rank, item in enumerate(sorted_items, start=1):
-        line = f"{rank}. {item['username']} - Elo: {item['elo']}"
+        if rank == 0:
+            line = f" The Best Player Today -> {rank}. {item['username']} ({item['elo']}) - Problems Solved: {item['problem_solved']}"
+        else:
+            line = f"#{rank}. {item['username']} ({item['elo']}) - Problems Solved: {item['problems_solved']}"
         message_lines.append(line)
     full_message = "\n".join(message_lines)
 
-    # Discord webhook setup
-    webhook_url = os.getenv(WEBHOOK_URL)  # Environment variable for the webhook URL
+    # Hardcoded Discord webhook setup
+    # webhook_url = 'https://discord.com/api/webhooks/1229821635180105788/SrnGPWVbDa2kUha2qW0TDK71Wwgxnuibx09kGrIKTQncNx1L2IG5is8IwirXfZ4BEopr'
+    webhook_url = 'https://discord.com/api/webhooks/1229877765503979702/IcFNxzw6cdjDUe7FjondrWOFR0m73xHYFXOcCFRmv5W0rhnMTP9zetz_3DOOoABPxIsd'
     webhook = DiscordWebhook(url=webhook_url, content=full_message)
 
     # Send message to Discord
@@ -35,4 +40,3 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps('Message sent to Discord successfully!')
     }
-
