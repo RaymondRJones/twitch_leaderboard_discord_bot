@@ -95,14 +95,25 @@ def read_usernames_from_file(filename):
 
 def save_data_to_dynamodb(user_data):
     for user, elo, problems_solved_count in user_data:
+        response = table.get_item(
+            Key={'username': user}
+        )
+        item = response.get('Item', {})
+        last_week_problems_solved = item.get('problems_solved', 0)  # default to 0 if not found
+
+        problems_solved_since_last_week = problems_solved_count - last_week_problems_solved
+
         response = table.put_item(
             Item={
                 'username': user,
                 'elo': elo,
-                'problems_solved': problems_solved_count
+                'problems_solved': problems_solved_count,
+                'problems_solved_last_week': last_week_problems_solved,  # Update last week's count to current
+                'problems_solved_since_last_week': problems_solved_since_last_week  # Store the computed difference
             }
         )
-        print(f"Data written to DynamoDB for user {user}: {response}")
+        print(f"Data updated in DynamoDB for user {user}: {response}")
+
 
 def main():
     usernames = read_usernames_from_file('usernames.txt')
