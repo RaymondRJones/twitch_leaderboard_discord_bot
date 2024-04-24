@@ -1,4 +1,4 @@
-# discord_bot_practice
+# Leetcode Leaderboard with Friends (Discord Bot)
 
 I wanted to create a way to see the Leetcode stats of your friends and rank them based on the amount of problems they solve every week. 
 
