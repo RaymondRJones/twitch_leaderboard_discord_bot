@@ -4,3 +4,4 @@ requests
 venv/
 python/
 python.zip
+scripts/cookies.py
